@@ -20,7 +20,6 @@ public:
 // 2. CONCRETE STRATEGIES
 // ==========================================
 
-// Strategy 1: UPI Delivery
 class UPIDelivery : public DeliveryStrategy {
 public:
     int calculateCost(int distance) override {
@@ -28,7 +27,6 @@ public:
     }
 };
 
-// Strategy 2: Cash Delivery
 class CashDelivery : public DeliveryStrategy {
 public:
     int calculateCost(int distance) override {
@@ -36,7 +34,6 @@ public:
     }
 };
 
-// Strategy 3: Premium Delivery
 class PremiumDelivery : public DeliveryStrategy {
 public:
     int calculateCost(int distance) override {
@@ -45,33 +42,34 @@ public:
 };
 
 // ==========================================
-// 3. FACTORY: CREATE STRATEGY
+// 3. FACTORY PATTERN
 // ==========================================
 
-unique_ptr<DeliveryStrategy>
-createDeliveryStrategy(string type) {
+class PaymentFactory {
+public:
+    static unique_ptr<DeliveryStrategy> createPayment(string type) {
 
-    if (type == "UPI") {
-        return make_unique<UPIDelivery>();
+        if (type == "UPI") {
+            return make_unique<UPIDelivery>();
+        }
+
+        else if (type == "CASH") {
+            return make_unique<CashDelivery>();
+        }
+
+        else if (type == "PREMIUM") {
+            return make_unique<PremiumDelivery>();
+        }
+
+        throw invalid_argument("Invalid payment type");
     }
-
-    if (type == "CASH") {
-        return make_unique<CashDelivery>();
-    }
-
-    if (type == "PREMIUM") {
-        return make_unique<PremiumDelivery>();
-    }
-
-    throw invalid_argument("Invalid delivery type");
-}
+};
 
 // ==========================================
-// 4. CONTEXT CLASS
+// 4. CONTEXT CLASS (STRATEGY PATTERN)
 // ==========================================
 
 class PaymentService {
-
 private:
     unique_ptr<DeliveryStrategy> strategy;
 
@@ -86,7 +84,7 @@ public:
         strategy = move(s);
     }
 
-    // Delegate calculation to selected strategy
+    // Delegate calculation
     int calculateCost(int distance) {
         return strategy->calculateCost(distance);
     }
@@ -98,28 +96,28 @@ public:
 
 int main() {
 
-    // Create strategy using Factory
+    // Create PaymentService with UPI strategy
     PaymentService service(
-        createDeliveryStrategy("UPI")
+        PaymentFactory::createPayment("UPI")
     );
 
-    cout << "UPI Delivery: "
+    cout << "UPI Delivery Cost: "
          << service.calculateCost(10) << endl;
 
-    // Change to Cash Delivery
+    // Change to Cash strategy
     service.setStrategy(
-        createDeliveryStrategy("CASH")
+        PaymentFactory::createPayment("CASH")
     );
 
-    cout << "Cash Delivery: "
+    cout << "Cash Delivery Cost: "
          << service.calculateCost(10) << endl;
 
-    // Change to Premium Delivery
+    // Change to Premium strategy
     service.setStrategy(
-        createDeliveryStrategy("PREMIUM")
+        PaymentFactory::createPayment("PREMIUM")
     );
 
-    cout << "Premium Delivery: "
+    cout << "Premium Delivery Cost: "
          << service.calculateCost(10) << endl;
 
     return 0;
