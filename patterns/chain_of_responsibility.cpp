@@ -73,3 +73,12 @@ int main() {
 
     return 0;
 }
+
+// 6. When should you use it?
+// Some real-world examples:
+// Application	Chain
+// Customer      support	Executive → Manager → Head
+// Logging	     Debug → Info → Warning → Error
+// Expense approval	Manager → Director → CEO
+// HTTP middleware	Authentication → Authorization → Logging
+// Event processing	Multiple event handlers
